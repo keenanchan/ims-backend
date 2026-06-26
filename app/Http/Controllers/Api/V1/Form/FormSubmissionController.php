@@ -8,6 +8,7 @@ use App\Http\Requests\Form\UpdateFormSubmissionRequest;
 use App\Http\Resources\Form\FormSubmissionResource;
 use App\Models\FormSubmission;
 use App\Models\FormTemplate;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +16,8 @@ use Illuminate\Support\Facades\DB;
 
 class FormSubmissionController extends Controller
 {
+    public function __construct(private readonly NotificationService $notifications) {}
+
     /**
      * Display a listing of the resource.
      */
@@ -67,7 +70,10 @@ class FormSubmissionController extends Controller
 
             $submission->update(['current_version_id' => $version->id]);
 
-            return new FormSubmissionResource($submission->load(['template', 'templateVersion', 'creator', 'currentVersion.user']));
+            $submission->load(['template', 'templateVersion', 'creator', 'currentVersion.user']);
+            $this->notifications->notifySubmitted($submission);
+
+            return new FormSubmissionResource($submission);
         });
     }
 
@@ -86,14 +92,18 @@ class FormSubmissionController extends Controller
     {
         $this->authorize('update', $formSubmission);
 
-        return DB::transaction(function () use ($request, $formSubmission) {
+        $conflictSubmission = null;
+
+        $result = DB::transaction(function () use ($request, $formSubmission, &$conflictSubmission) {
             $lockedSubmission = FormSubmission::with('currentVersion')
                 ->lockForUpdate()
                 ->findOrFail($formSubmission->id);
             $currentVersion = $lockedSubmission->currentVersion;
 
             if ($currentVersion->version_number !== (int) $request->version_number) {
-                abort(409, 'Version conflict');
+                $conflictSubmission = $lockedSubmission;
+
+                return null;
             }
 
             $newVersion = $lockedSubmission->versions()->create([
@@ -112,5 +122,12 @@ class FormSubmissionController extends Controller
 
             return new FormSubmissionResource($lockedSubmission->load(['template', 'creator', 'currentVersion.user']));
         });
+
+        if ($conflictSubmission) {
+            $this->notifications->notifyConflict($conflictSubmission, Auth::guard('api')->user());
+            abort(409, 'Version conflict');
+        }
+
+        return $result;
     }
 }

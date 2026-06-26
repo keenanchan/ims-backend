@@ -7,9 +7,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Form\RejectFormSubmissionRequest;
 use App\Http\Resources\Form\FormSubmissionResource;
 use App\Models\FormSubmission;
+use App\Services\NotificationService;
 
 class WorkflowController extends Controller
 {
+    public function __construct(private readonly NotificationService $notifications) {}
+
     /**
      * Transition a draft submission to pending_approval.
      */
@@ -38,8 +41,10 @@ class WorkflowController extends Controller
         }
 
         $formSubmission->update(['status' => SubmissionStatus::Approved]);
+        $formSubmission->load(['template', 'creator', 'currentVersion']);
+        $this->notifications->notifyApproved($formSubmission);
 
-        return new FormSubmissionResource($formSubmission->load(['template', 'creator', 'currentVersion.user']));
+        return new FormSubmissionResource($formSubmission);
     }
 
     /**
@@ -54,7 +59,9 @@ class WorkflowController extends Controller
         }
 
         $formSubmission->update(['status' => SubmissionStatus::Rejected]);
+        $formSubmission->load(['template', 'creator', 'currentVersion']);
+        $this->notifications->notifyRejected($formSubmission);
 
-        return new FormSubmissionResource($formSubmission->load(['template', 'creator', 'currentVersion.user']));
+        return new FormSubmissionResource($formSubmission);
     }
 }

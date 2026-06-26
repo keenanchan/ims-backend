@@ -11,6 +11,7 @@ $testEnv = [
     'DB_CONNECTION' => 'sqlite',
     'DB_DATABASE' => ':memory:',
     'JWT_SECRET' => 'YzvcZsadYTCpMIqoOzYH9146lMXMv6fhxj1t0SdjuXIuTje0igY0uU900xBIzIT3',
+    'SESSION_DRIVER' => 'array',
 ];
 
 foreach ($testEnv as $key => $value) {
