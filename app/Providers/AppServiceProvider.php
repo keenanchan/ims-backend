@@ -6,12 +6,14 @@ use App\Models\Department;
 use App\Models\FormSubmission;
 use App\Models\FormTemplate;
 use App\Models\Role;
+use App\Models\SyncConflict;
 use App\Models\Team;
 use App\Models\User;
 use App\Policies\DepartmentPolicy;
 use App\Policies\FormSubmissionPolicy;
 use App\Policies\FormTemplatePolicy;
 use App\Policies\RolePolicy;
+use App\Policies\SyncConflictPolicy;
 use App\Policies\TeamPolicy;
 use App\Policies\UserPolicy;
 use App\Services\Identity\IdentityService;
@@ -50,5 +52,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Team::class, TeamPolicy::class);
         Gate::policy(FormTemplate::class, FormTemplatePolicy::class);
         Gate::policy(FormSubmission::class, FormSubmissionPolicy::class);
+        Gate::policy(SyncConflict::class, SyncConflictPolicy::class);
     }
 }
