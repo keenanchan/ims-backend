@@ -18,8 +18,11 @@ use App\Policies\TeamPolicy;
 use App\Policies\UserPolicy;
 use App\Services\Identity\IdentityService;
 use App\Services\Identity\IdentityServiceInterface;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -53,5 +56,13 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(FormTemplate::class, FormTemplatePolicy::class);
         Gate::policy(FormSubmission::class, FormSubmissionPolicy::class);
         Gate::policy(SyncConflict::class, SyncConflictPolicy::class);
+
+        RateLimiter::for('auth', function (Request $request): Limit {
+            return Limit::perMinute(10)->by($request->ip());
+        });
+
+        RateLimiter::for('api', function (Request $request): Limit {
+            return Limit::perMinute(120)->by($request->user()?->id ?? $request->ip());
+        });
     }
 }

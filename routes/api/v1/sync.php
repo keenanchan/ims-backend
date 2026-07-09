@@ -5,7 +5,7 @@ use App\Http\Controllers\Api\V1\Sync\SyncPullController;
 use App\Http\Controllers\Api\V1\Sync\SyncPushController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth:api')->group(function () {
+Route::middleware(['auth:api', 'throttle:api'])->group(function () {
     Route::get('sync', SyncPullController::class);
     Route::post('sync/push', SyncPushController::class);
 
