@@ -16,6 +16,7 @@ class FormSubmissionResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'client_uuid' => $this->client_uuid,
             // 'form_template_id' => $this->form_template_id,
             // 'current_version_id' => $this->current_version_id,
             'priority' => $this->priority?->value,

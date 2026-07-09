@@ -23,6 +23,8 @@ class FormSubmissionVersionResource extends JsonResource
             'form_name' => $this->form_name,
             'content' => $this->content,
             'version_number' => $this->version_number,
+            'base_version_number' => $this->base_version_number,
+            'client_uuid' => $this->client_uuid,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

@@ -49,6 +49,7 @@ class StoreFormSubmissionRequest extends FormRequest
             'form_name' => ['required', 'string', 'max:255'],
             'content' => $contentRules,
             'priority' => ['nullable', new Enum(SubmissionPriority::class)],
+            'client_uuid' => ['nullable', 'uuid'],
         ];
     }
 }

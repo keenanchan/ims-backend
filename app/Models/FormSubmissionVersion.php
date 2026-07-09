@@ -16,6 +16,8 @@ class FormSubmissionVersion extends Model
         'form_name',
         'content',
         'version_number',
+        'base_version_number',
+        'client_uuid',
     ];
 
     protected function casts(): array
@@ -23,6 +25,7 @@ class FormSubmissionVersion extends Model
         return [
             'content' => 'array',
             'version_number' => 'integer',
+            'base_version_number' => 'integer',
         ];
     }
 

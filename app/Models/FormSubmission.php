@@ -19,6 +19,7 @@ class FormSubmission extends Model
         'form_template_version_id',
         'created_by',
         'current_version_id',
+        'client_uuid',
         'priority',
         'status',
         'assignee_type',

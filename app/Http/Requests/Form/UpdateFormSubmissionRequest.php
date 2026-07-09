@@ -41,6 +41,7 @@ class UpdateFormSubmissionRequest extends FormRequest
             'content' => $contentRules,
             'version_number' => ['required', 'integer'],
             'priority' => ['nullable', new Enum(SubmissionPriority::class)],
+            'client_uuid' => ['nullable', 'uuid'],
         ];
     }
 }

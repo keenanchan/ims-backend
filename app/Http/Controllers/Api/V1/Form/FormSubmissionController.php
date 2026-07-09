@@ -2,21 +2,27 @@
 
 namespace App\Http\Controllers\Api\V1\Form;
 
+use App\Enums\SubmissionStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Form\StoreFormSubmissionRequest;
 use App\Http\Requests\Form\UpdateFormSubmissionRequest;
 use App\Http\Resources\Form\FormSubmissionResource;
+use App\Http\Resources\Form\FormSubmissionVersionResource;
 use App\Models\FormSubmission;
 use App\Models\FormTemplate;
+use App\Services\Form\SubmissionSyncService;
 use App\Services\NotificationService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class FormSubmissionController extends Controller
 {
-    public function __construct(private readonly NotificationService $notifications) {}
+    public function __construct(
+        private readonly NotificationService $notifications,
+        private readonly SubmissionSyncService $sync,
+    ) {}
 
     /**
      * Display a listing of the resource.
@@ -46,35 +52,31 @@ class FormSubmissionController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     *
+     * Idempotent when a client_uuid is supplied: replaying the same create
+     * returns the existing submission (200) instead of creating a duplicate.
      */
     public function store(StoreFormSubmissionRequest $request): FormSubmissionResource
     {
         $template = FormTemplate::findOrFail($request->form_template_id);
         $this->authorize('create', [FormSubmission::class, $template]);
 
-        return DB::transaction(function () use ($request) {
-            $submission = FormSubmission::create([
-                'form_template_id' => $request->form_template_id,
-                'form_template_version_id' => $request->form_template_version_id,
-                'created_by' => Auth::guard('api')->id(),
-                'priority' => $request->priority,
-            ]);
-            $submission->load('template');
+        $result = $this->sync->createSubmission($request->user('api'), [
+            'form_template_id' => $request->form_template_id,
+            'form_template_version_id' => $request->form_template_version_id,
+            'form_name' => $request->form_name,
+            'content' => $request->content,
+            'priority' => $request->priority,
+            'client_uuid' => $request->client_uuid,
+        ]);
 
-            $version = $submission->versions()->create([
-                'user_id' => Auth::guard('api')->id(),
-                'form_name' => $request->form_name,
-                'content' => $request->content,
-                'version_number' => 1,
-            ]);
+        $submission = $result->submission->load(['template', 'templateVersion', 'creator', 'currentVersion.user']);
 
-            $submission->update(['current_version_id' => $version->id]);
-
-            $submission->load(['template', 'templateVersion', 'creator', 'currentVersion.user']);
+        if ($result->isApplied()) {
             $this->notifications->notifySubmitted($submission);
+        }
 
-            return new FormSubmissionResource($submission);
-        });
+        return new FormSubmissionResource($submission);
     }
 
     /**
@@ -87,47 +89,47 @@ class FormSubmissionController extends Controller
 
     /**
      * Update the specified resource in storage.
+     *
+     * Optimistic locking: a stale version_number yields a structured 409 that
+     * carries the current server version so clients can merge without a
+     * follow-up GET. Idempotent when a client_uuid is supplied for the new
+     * version: a replayed update returns current state instead of
+     * double-incrementing or falsely conflicting.
      */
-    public function update(UpdateFormSubmissionRequest $request, FormSubmission $formSubmission): FormSubmissionResource
+    public function update(UpdateFormSubmissionRequest $request, FormSubmission $formSubmission): FormSubmissionResource|JsonResponse
     {
-        $this->authorize('update', $formSubmission);
-
-        $conflictSubmission = null;
-
-        $result = DB::transaction(function () use ($request, $formSubmission, &$conflictSubmission) {
-            $lockedSubmission = FormSubmission::with('currentVersion')
-                ->lockForUpdate()
-                ->findOrFail($formSubmission->id);
-            $currentVersion = $lockedSubmission->currentVersion;
-
-            if ($currentVersion->version_number !== (int) $request->version_number) {
-                $conflictSubmission = $lockedSubmission;
-
-                return null;
-            }
-
-            $newVersion = $lockedSubmission->versions()->create([
-                'user_id' => Auth::guard('api')->id(),
-                'form_name' => $request->form_name,
-                'content' => $request->content,
-                'version_number' => $currentVersion->version_number + 1,
-            ]);
-
-            $updateData = ['current_version_id' => $newVersion->id];
-            if ($request->has('priority')) {
-                $updateData['priority'] = $request->priority;
-            }
-
-            $lockedSubmission->update($updateData);
-
-            return new FormSubmissionResource($lockedSubmission->load(['template', 'creator', 'currentVersion.user']));
-        });
-
-        if ($conflictSubmission) {
-            $this->notifications->notifyConflict($conflictSubmission, Auth::guard('api')->user());
-            abort(409, 'Version conflict');
+        if ($formSubmission->status === SubmissionStatus::Approved) {
+            return response()->json([
+                'message' => 'Submission is approved and locked.',
+                'error' => 'submission_locked',
+            ], 403);
         }
 
-        return $result;
+        $this->authorize('update', $formSubmission);
+
+        $data = [
+            'form_name' => $request->form_name,
+            'content' => $request->content,
+            'version_number' => $request->version_number,
+            'client_uuid' => $request->client_uuid,
+        ];
+        if ($request->has('priority')) {
+            $data['priority'] = $request->priority;
+        }
+
+        $result = $this->sync->updateSubmission($formSubmission, $request->user('api'), $data);
+
+        if ($result->isConflict()) {
+            $this->notifications->notifyConflict($result->submission, Auth::guard('api')->user());
+
+            return response()->json([
+                'message' => 'Version conflict',
+                'error' => 'version_conflict',
+                'current_version' => new FormSubmissionVersionResource($result->submission->currentVersion->load('user')),
+                'your_base_version_number' => (int) $request->version_number,
+            ], 409);
+        }
+
+        return new FormSubmissionResource($result->submission->load(['template', 'creator', 'currentVersion.user']));
     }
 }
