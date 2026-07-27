@@ -14,9 +14,6 @@ use Illuminate\Support\Facades\DB;
 
 class FormTemplateController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request): AnonymousResourceCollection
     {
         $query = FormTemplate::query()->with(['creator', 'currentVersion']);
@@ -36,9 +33,6 @@ class FormTemplateController extends Controller
         return FormTemplateResource::collection($query->paginate($perPage));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreFormTemplateRequest $request): FormTemplateResource
     {
         return DB::transaction(function () use ($request) {
@@ -62,9 +56,6 @@ class FormTemplateController extends Controller
         });
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(FormTemplate $formTemplate): FormTemplateResource
     {
         $this->authorize('view', $formTemplate);
@@ -72,9 +63,6 @@ class FormTemplateController extends Controller
         return new FormTemplateResource($formTemplate->load(['creator', 'currentVersion.user']));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateFormTemplateRequest $request, FormTemplate $formTemplate): FormTemplateResource
     {
         return DB::transaction(function () use ($request, $formTemplate) {

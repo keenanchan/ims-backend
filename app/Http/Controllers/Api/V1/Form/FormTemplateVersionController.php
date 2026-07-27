@@ -10,9 +10,6 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class FormTemplateVersionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(FormTemplate $formTemplate): AnonymousResourceCollection
     {
         return FormTemplateVersionResource::collection(
@@ -20,9 +17,6 @@ class FormTemplateVersionController extends Controller
         );
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(FormTemplate $formTemplate, FormTemplateVersion $version): FormTemplateVersionResource
     {
         if ($version->template_id !== $formTemplate->id) {

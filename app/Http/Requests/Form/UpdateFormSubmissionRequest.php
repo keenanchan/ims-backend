@@ -23,12 +23,14 @@ class UpdateFormSubmissionRequest extends FormRequest
      */
     public function rules(): array
     {
-        $template = $this->route('form_submission')?->template;
+        // Validate against the pinned template version the submission was created
+        // against, not the live template (whose schema may have since changed).
+        $templateVersion = $this->route('form_submission')?->templateVersion;
 
         $contentRules = ['required', 'array'];
 
-        if ($template) {
-            $contentRules[] = new ContentMatchesTemplateSchema($template->json_schema);
+        if ($templateVersion) {
+            $contentRules[] = new ContentMatchesTemplateSchema($templateVersion->json_schema);
         }
 
         return [

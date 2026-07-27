@@ -46,7 +46,11 @@ test('user can list form submissions', function () {
 
 test('user can update form submission and create new version', function () {
     $template = FormTemplate::factory()->create();
-    $submission = FormSubmission::create(['form_template_id' => $template->id]);
+    $templateVersion = FormTemplateVersion::factory()->create(['template_id' => $template->id]);
+    $submission = FormSubmission::create([
+        'form_template_id' => $template->id,
+        'form_template_version_id' => $templateVersion->id,
+    ]);
     $v1 = $submission->versions()->create([
         'user_id' => $this->user->id,
         'form_name' => $template->name,
@@ -64,6 +68,7 @@ test('user can update form submission and create new version', function () {
     ]);
 
     $response->assertSuccessful()
+        ->assertJsonPath('data.template_version.id', $templateVersion->id)
         ->assertJsonPath('data.current_version.version_number', 2)
         ->assertJsonPath('data.current_version.form_name', $template->name)
         ->assertJsonPath('data.current_version.content.v', 2);

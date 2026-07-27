@@ -15,9 +15,6 @@ use Illuminate\Support\Facades\DB;
 
 class FormSubmissionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request): AnonymousResourceCollection
     {
         $query = FormSubmission::query()
@@ -33,9 +30,6 @@ class FormSubmissionController extends Controller
         return FormSubmissionResource::collection($query->paginate($perPage));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreFormSubmissionRequest $request): FormSubmissionResource
     {
         $template = FormTemplate::findOrFail($request->form_template_id);
@@ -61,17 +55,11 @@ class FormSubmissionController extends Controller
         });
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(FormSubmission $formSubmission): FormSubmissionResource
     {
         return new FormSubmissionResource($formSubmission->load(['template', 'templateVersion', 'currentVersion.user', 'versions']));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateFormSubmissionRequest $request, FormSubmission $formSubmission): FormSubmissionResource
     {
         $this->authorize('update', $formSubmission);
@@ -95,7 +83,7 @@ class FormSubmissionController extends Controller
 
             $lockedSubmission->update(['current_version_id' => $newVersion->id]);
 
-            return new FormSubmissionResource($lockedSubmission->load(['template', 'currentVersion.user']));
+            return new FormSubmissionResource($lockedSubmission->load(['template', 'templateVersion', 'currentVersion.user']));
         });
     }
 }

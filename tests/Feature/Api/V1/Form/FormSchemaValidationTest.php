@@ -269,7 +269,11 @@ test('submission store validates additional optional fields pass when present an
 
 test('submission update rejects content that does not match the template schema', function () {
     $template = FormTemplate::factory()->create(['json_schema' => typedSchema()]);
-    $submission = FormSubmission::create(['form_template_id' => $template->id]);
+    $version = FormTemplateVersion::factory()->create(['template_id' => $template->id, 'json_schema' => typedSchema()]);
+    $submission = FormSubmission::create([
+        'form_template_id' => $template->id,
+        'form_template_version_id' => $version->id,
+    ]);
     $v1 = $submission->versions()->create([
         'user_id' => $this->user->id,
         'form_name' => $template->name,
@@ -290,7 +294,11 @@ test('submission update rejects content that does not match the template schema'
 
 test('submission update accepts content matching the template schema', function () {
     $template = FormTemplate::factory()->create(['json_schema' => typedSchema()]);
-    $submission = FormSubmission::create(['form_template_id' => $template->id]);
+    $version = FormTemplateVersion::factory()->create(['template_id' => $template->id, 'json_schema' => typedSchema()]);
+    $submission = FormSubmission::create([
+        'form_template_id' => $template->id,
+        'form_template_version_id' => $version->id,
+    ]);
     $v1 = $submission->versions()->create([
         'user_id' => $this->user->id,
         'form_name' => $template->name,
@@ -310,7 +318,11 @@ test('submission update accepts content matching the template schema', function 
 
 test('submission update rejects content missing required field', function () {
     $template = FormTemplate::factory()->create(['json_schema' => typedSchema()]);
-    $submission = FormSubmission::create(['form_template_id' => $template->id]);
+    $version = FormTemplateVersion::factory()->create(['template_id' => $template->id, 'json_schema' => typedSchema()]);
+    $submission = FormSubmission::create([
+        'form_template_id' => $template->id,
+        'form_template_version_id' => $version->id,
+    ]);
     $v1 = $submission->versions()->create([
         'user_id' => $this->user->id,
         'form_name' => $template->name,
@@ -327,4 +339,38 @@ test('submission update rejects content missing required field', function () {
 
     $response->assertUnprocessable()
         ->assertJsonValidationErrors(['content']);
+});
+
+test('submission update validates against the pinned version schema, not the live template', function () {
+    // Submission is pinned to v1's schema (name + optional age, name required).
+    $template = FormTemplate::factory()->create(['json_schema' => typedSchema()]);
+    $version = FormTemplateVersion::factory()->create(['template_id' => $template->id, 'json_schema' => typedSchema()]);
+    $submission = FormSubmission::create([
+        'form_template_id' => $template->id,
+        'form_template_version_id' => $version->id,
+    ]);
+    $v1 = $submission->versions()->create([
+        'user_id' => $this->user->id,
+        'form_name' => $template->name,
+        'content' => ['name' => 'John'],
+        'version_number' => 1,
+    ]);
+    $submission->update(['current_version_id' => $v1->id]);
+
+    // The live template schema later diverges to require a different field.
+    $template->update(['json_schema' => [
+        'type' => 'object',
+        'properties' => ['email' => ['type' => 'string']],
+        'required' => ['email'],
+    ]]);
+
+    // Content valid under the pinned v1 schema (but invalid under the live one)
+    // must be accepted, because the submission is validated against its pin.
+    $response = $this->putJson("/api/v1/form-submissions/{$submission->id}", [
+        'form_name' => $template->name,
+        'content' => ['name' => 'Jane'],
+        'version_number' => 1,
+    ], ['Authorization' => "Bearer $this->token"]);
+
+    $response->assertSuccessful();
 });

@@ -1,0 +1,1180 @@
+openapi: 3.0.3
+info:
+  title: 'Laravel API Documentation'
+  description: ''
+  version: 1.0.0
+servers:
+  -
+    url: 'http://localhost:8000'
+tags:
+  -
+    name: Endpoints
+    description: ''
+components:
+  securitySchemes:
+    default:
+      type: http
+      scheme: bearer
+      description: 'You can retrieve your token by visiting the login endpoint.'
+security:
+  -
+    default: []
+paths:
+  /api/v1/auth/login:
+    post:
+      summary: ''
+      operationId: postApiV1AuthLogin
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: 'Must be a valid email address.'
+                  example: qkunze@example.com
+                password:
+                  type: string
+                  description: ''
+                  example: 'O[2UZ5ij-e/dl4m{o,'
+              required:
+                - email
+                - password
+  /api/v1/auth/logout:
+    post:
+      summary: ''
+      operationId: postApiV1AuthLogout
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+  /api/v1/auth/refresh:
+    post:
+      summary: ''
+      operationId: postApiV1AuthRefresh
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+  /api/v1/auth/me:
+    get:
+      summary: ''
+      operationId: getApiV1AuthMe
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+  /api/v1/auth/change-password:
+    post:
+      summary: ''
+      operationId: postApiV1AuthChangePassword
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                current_password:
+                  type: string
+                  description: ''
+                  example: consequatur
+                password:
+                  type: string
+                  description: ''
+                  example: consequatur
+              required:
+                - current_password
+                - password
+  /api/v1/users:
+    get:
+      summary: ''
+      operationId: getApiV1Users
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+    post:
+      summary: ''
+      operationId: postApiV1Users
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: vmqeopfuudtdsufvyvddq
+                email:
+                  type: string
+                  description: 'Must be a valid email address. Must not be greater than 255 characters.'
+                  example: kunde.eloisa@example.com
+                password:
+                  type: string
+                  description: ''
+                  example: consequatur
+                department_ids:
+                  type: array
+                  description: 'The <code>id</code> of an existing record in the departments table.'
+                  example: null
+                  items:
+                    type: string
+                team_ids:
+                  type: array
+                  description: 'The <code>id</code> of an existing record in the teams table.'
+                  example: null
+                  items:
+                    type: string
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: true
+                role_id:
+                  type: string
+                  description: 'The <code>id</code> of an existing record in the roles table.'
+                  example: null
+                  nullable: true
+              required:
+                - name
+                - email
+                - password
+  '/api/v1/users/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1UsersId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+    put:
+      summary: ''
+      operationId: putApiV1UsersId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: vmqeopfuudtdsufvyvddq
+                email:
+                  type: string
+                  description: 'Must be a valid email address. Must not be greater than 255 characters.'
+                  example: kunde.eloisa@example.com
+                password:
+                  type: string
+                  description: ''
+                  example: null
+                department_ids:
+                  type: array
+                  description: 'The <code>id</code> of an existing record in the departments table.'
+                  example: null
+                  items:
+                    type: string
+                team_ids:
+                  type: array
+                  description: 'The <code>id</code> of an existing record in the teams table.'
+                  example: null
+                  items:
+                    type: string
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: false
+                role_id:
+                  type: string
+                  description: 'The <code>id</code> of an existing record in the roles table.'
+                  example: null
+                  nullable: true
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the user.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/users/{user_id}/departments':
+    post:
+      summary: ''
+      operationId: postApiV1UsersUser_idDepartments
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                department_ids:
+                  type: array
+                  description: 'The <code>id</code> of an existing record in the departments table.'
+                  example: null
+                  items:
+                    type: string
+    get:
+      summary: ''
+      operationId: getApiV1UsersUser_idDepartments
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: user_id
+        description: 'The ID of the user.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/users/{user_id}/teams':
+    post:
+      summary: ''
+      operationId: postApiV1UsersUser_idTeams
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                team_ids:
+                  type: array
+                  description: 'The <code>id</code> of an existing record in the teams table.'
+                  example: null
+                  items:
+                    type: string
+    get:
+      summary: ''
+      operationId: getApiV1UsersUser_idTeams
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: user_id
+        description: 'The ID of the user.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/departments:
+    get:
+      summary: ''
+      operationId: getApiV1Departments
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+    post:
+      summary: ''
+      operationId: postApiV1Departments
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: vmqeopfuudtdsufvyvddq
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: true
+              required:
+                - name
+  '/api/v1/departments/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1DepartmentsId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+    put:
+      summary: ''
+      operationId: putApiV1DepartmentsId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: vmqeopfuudtdsufvyvddq
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: true
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the department.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/teams:
+    get:
+      summary: ''
+      operationId: getApiV1Teams
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+    post:
+      summary: ''
+      operationId: postApiV1Teams
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: vmqeopfuudtdsufvyvddq
+                department_id:
+                  type: string
+                  description: 'The <code>id</code> of an existing record in the departments table.'
+                  example: consequatur
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: false
+              required:
+                - name
+                - department_id
+  '/api/v1/teams/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1TeamsId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+    put:
+      summary: ''
+      operationId: putApiV1TeamsId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: vmqeopfuudtdsufvyvddq
+                department_id:
+                  type: string
+                  description: 'The <code>id</code> of an existing record in the departments table.'
+                  example: null
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: true
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the team.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/roles:
+    get:
+      summary: ''
+      operationId: getApiV1Roles
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+    post:
+      summary: ''
+      operationId: postApiV1Roles
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: vmqeopfuudtdsufvyvddq
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: false
+              required:
+                - name
+  '/api/v1/roles/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1RolesId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+    put:
+      summary: ''
+      operationId: putApiV1RolesId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: vmqeopfuudtdsufvyvddq
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: false
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the role.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/form-templates:
+    get:
+      summary: ''
+      operationId: getApiV1FormTemplates
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+    post:
+      summary: ''
+      operationId: postApiV1FormTemplates
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: vmqeopfuudtdsufvyvddq
+                json_schema:
+                  type: object
+                  description: ''
+                  example: null
+                  properties: {  }
+                ui_schema:
+                  type: object
+                  description: ''
+                  example: null
+                  properties: {  }
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: true
+              required:
+                - name
+  '/api/v1/form-templates/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1FormTemplatesId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+    put:
+      summary: ''
+      operationId: putApiV1FormTemplatesId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: vmqeopfuudtdsufvyvddq
+                json_schema:
+                  type: object
+                  description: ''
+                  example: null
+                  properties: {  }
+                ui_schema:
+                  type: object
+                  description: ''
+                  example: null
+                  properties: {  }
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: true
+                version_number:
+                  type: integer
+                  description: ''
+                  example: 17
+              required:
+                - version_number
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the form template.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/form-templates/{formTemplate_id}/versions':
+    get:
+      summary: ''
+      operationId: getApiV1FormTemplatesFormTemplate_idVersions
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: formTemplate_id
+        description: 'The ID of the formTemplate.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/form-templates/{formTemplate_id}/versions/{version_id}':
+    get:
+      summary: ''
+      operationId: getApiV1FormTemplatesFormTemplate_idVersionsVersion_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: formTemplate_id
+        description: 'The ID of the formTemplate.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: version_id
+        description: 'The ID of the version.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/form-submissions:
+    get:
+      summary: ''
+      operationId: getApiV1FormSubmissions
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+    post:
+      summary: ''
+      operationId: postApiV1FormSubmissions
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                form_template_id:
+                  type: string
+                  description: 'The <code>id</code> of an existing record in the form_templates table.'
+                  example: consequatur
+                form_template_version_id:
+                  type: string
+                  description: 'The <code>id</code> of an existing record in the form_template_versions table.'
+                  example: consequatur
+                form_name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: mqeopfuudtdsufvyvddqa
+                content:
+                  type: object
+                  description: ''
+                  example: []
+                  properties: {  }
+              required:
+                - form_template_id
+                - form_template_version_id
+                - form_name
+                - content
+  '/api/v1/form-submissions/{id}':
+    get:
+      summary: ''
+      operationId: getApiV1FormSubmissionsId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+    put:
+      summary: ''
+      operationId: putApiV1FormSubmissionsId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                form_name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: vmqeopfuudtdsufvyvddq
+                content:
+                  type: object
+                  description: ''
+                  example: []
+                  properties: {  }
+                version_number:
+                  type: integer
+                  description: ''
+                  example: 17
+              required:
+                - form_name
+                - content
+                - version_number
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the form submission.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/form-submissions/{formSubmission_id}/versions':
+    get:
+      summary: ''
+      operationId: getApiV1FormSubmissionsFormSubmission_idVersions
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: formSubmission_id
+        description: 'The ID of the formSubmission.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/form-submissions/{formSubmission_id}/versions/{version_id}':
+    get:
+      summary: ''
+      operationId: getApiV1FormSubmissionsFormSubmission_idVersionsVersion_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: formSubmission_id
+        description: 'The ID of the formSubmission.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: version_id
+        description: 'The ID of the version.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/form-templates/{formTemplate_id}/permissions':
+    get:
+      summary: 'List all permission grants for a template.'
+      operationId: listAllPermissionGrantsForATemplate
+      description: 'Admin only.'
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+    post:
+      summary: 'Grant a permission on a template to a role, department, or team.'
+      operationId: grantAPermissionOnATemplateToARoleDepartmentOrTeam
+      description: 'Admin only. Duplicate grants are silently ignored (idempotent).'
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  description: ''
+                  example: view
+                  enum:
+                    - view
+                    - create
+                    - edit
+                permissible_type:
+                  type: string
+                  description: ''
+                  example: role
+                  enum:
+                    - role
+                    - department
+                    - team
+                permissible_id:
+                  type: integer
+                  description: ''
+                  example: 17
+              required:
+                - action
+                - permissible_type
+                - permissible_id
+    parameters:
+      -
+        in: path
+        name: formTemplate_id
+        description: 'The ID of the formTemplate.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/form-templates/{formTemplate_id}/permissions/{permission_id}':
+    delete:
+      summary: 'Revoke a permission grant.'
+      operationId: revokeAPermissionGrant
+      description: 'Admin only.'
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: formTemplate_id
+        description: 'The ID of the formTemplate.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: permission_id
+        description: 'The ID of the permission.'
+        example: 17
+        required: true
+        schema:
+          type: integer
+  '/api/v1/form-templates/{formTemplate_id}/my-permissions':
+    get:
+      summary: "Return the current user's resolved permissions for a template."
+      operationId: returnTheCurrentUsersResolvedPermissionsForATemplate
+      description: 'Available to all authenticated users.'
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: formTemplate_id
+        description: 'The ID of the formTemplate.'
+        example: 1
+        required: true
+        schema:
+          type: integer

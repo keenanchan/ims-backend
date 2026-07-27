@@ -10,9 +10,6 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class FormSubmissionVersionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(FormSubmission $formSubmission): AnonymousResourceCollection
     {
         return FormSubmissionVersionResource::collection(
@@ -20,9 +17,6 @@ class FormSubmissionVersionController extends Controller
         );
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(FormSubmission $formSubmission, FormSubmissionVersion $version): FormSubmissionVersionResource
     {
         // Ensure the version belongs to the submission
