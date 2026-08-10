@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -20,8 +19,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('form_submissions', function (Blueprint $table): void {
-            $table->dropForeignIdFor(User::class, 'created_by');
-            $table->dropColumn('created_by');
+            $table->dropConstrainedForeignId('created_by');
         });
     }
 };
